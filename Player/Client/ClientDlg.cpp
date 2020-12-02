@@ -7,9 +7,9 @@
 #include "Client.h"
 #include "ClientDlg.h"
 #include "afxdialogex.h"
-#include"afxsock.h"
 #include<iostream>
 #include<cstring>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -22,7 +22,6 @@ using namespace std;
 
 CClientDlg::CClientDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_CLIENT_DIALOG, pParent)
-	, m_status2(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -37,7 +36,7 @@ void CClientDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, ansC, m_btnC);
 	DDX_Control(pDX, ansB, m_btnB);
 	DDX_Control(pDX, ansD, m_btnD);
-	DDX_Text(pDX, status, m_status2);
+	DDX_Control(pDX, timeCount, m_time);
 }
 
 BEGIN_MESSAGE_MAP(CClientDlg, CDialogEx)
@@ -45,13 +44,11 @@ BEGIN_MESSAGE_MAP(CClientDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_Login, &CClientDlg::OnBnClickedLogin)
 	ON_BN_CLICKED(IDC_Skip, &CClientDlg::OnBnClickedSkip)
-	ON_BN_CLICKED(IDC_Start, &CClientDlg::OnBnClickedStart)
 	ON_BN_CLICKED(IDC_Logout, &CClientDlg::OnBnClickedLogout)
 	ON_BN_CLICKED(IDC_btnA, &CClientDlg::OnBnClickedA)
 	//ON_BN_CLICKED(IDC_btnB, &CClientDlg::OnBnClickedB)
 	//ON_BN_CLICKED(IDC_btnC, &CClientDlg::OnBnClickedC)
 	//ON_BN_CLICKED(IDC_btnD, &CClientDlg::OnBnClickedD)
-
 END_MESSAGE_MAP()
 
 
@@ -119,55 +116,184 @@ void CClientDlg::OnBnClickedLogin()
 	// with the ENM_CHANGE flag ORed into the mask.
 
 	// TODO:  Add your control notification handler code here
-	/*unsigned int port = 1234;
-	
-	CSocket client;
+	unsigned int port = 1234;
+
+
+	CClientDlg dlg;
+
 	AfxSocketInit(NULL);
-
+	
 	client.Create();
-
-	if (!client.Connect(_T("192.168.1.1"), port)) {
-		m_status.SetWindowTextW(_T("Cannot connect to server"));
-	}	
+	if (!client.Connect(_T("127.0.0.1"), port)) {
+		m_status.SetWindowText(_T("Cannot connect to server"));
+		client.Close();
+	}
 	else
 	{
 		m_status.SetWindowText(_T("Login success!"));
-		client.Send()
+		//msgSize = m_username.GetWindowTextLengthW();
+		//client.Send(&msgSize, sizeof(msgSize), 0);
+		//GetDlgItemText(IDC_EnterUSN, msg, 500);
+		//client.Send(msg, msgSize, 0);
 
-	}*/
-	m_status.SetWindowTextW(_T("Success\n"));
-	
+		int num_quest;
+		client.Receive((char*)&num_quest, sizeof(int), 0);
 
-	
+		//for (int q = 0; q < num_quest; q++) {
+
+			client.Receive((char*)&msgSize, sizeof(int), 0);
+			temp = new char[msgSize + 1];
+			client.Receive((char*)temp, msgSize, 0);
+			temp[msgSize] = '\0';
+			question = CString(temp);
+			m_question.SetWindowText(question);
+			delete temp;
+
+
+			client.Receive((char*)&msgSize, sizeof(int), 0);
+			temp = new char[msgSize + 1];
+			client.Receive((char*)temp, msgSize, 0);
+			temp[msgSize] = '\0';
+			choiceA = CString(temp);
+			m_btnA.SetWindowTextW(choiceA);
+			delete temp;
+
+			client.Receive((char*)&msgSize, sizeof(int), 0);
+			temp = new char[msgSize + 1];
+			client.Receive((char*)temp, msgSize, 0);
+			temp[msgSize] = '\0';
+			choiceB = CString(temp);
+			m_btnB.SetWindowTextW(choiceB);
+			delete temp;
+
+			client.Receive((char*)&msgSize, sizeof(int), 0);
+			temp = new char[msgSize + 1];
+			client.Receive((char*)temp, msgSize, 0);
+			temp[msgSize] = '\0';
+			choiceC = CString(temp);
+			m_btnC.SetWindowTextW(choiceC);
+			delete temp;
+
+			client.Receive((char*)&msgSize, sizeof(int), 0);
+			temp = new char[msgSize + 1];
+			client.Receive((char*)temp, msgSize, 0);
+			temp[msgSize] = '\0';
+			choiceD = CString(temp);
+			m_btnD.SetWindowTextW(choiceD);
+			delete temp;
+
+			//}
+	}
+
 }
 
 
 void CClientDlg::OnBnClickedSkip()
 {
 	// TODO: Add your control notification handler code here
-	int start = 0;
-	int end = m_question.GetWindowTextLength();
-	m_question.SetSel(start, end);
-	m_question.ReplaceSel(L"Question 2");
+	client.Send("0", 1, 0);
+	client.Receive(&question, sizeof(question), 0);
+	m_question.SetWindowTextW(question);
+	client.Receive(&choiceA, sizeof(choiceA), 0);
+	m_btnA.SetWindowTextW(choiceA);
+	client.Receive(&choiceB, sizeof(choiceB), 0);
+	m_btnA.SetWindowTextW(choiceB);
+	client.Receive(&choiceC, sizeof(choiceC), 0);
+	m_btnA.SetWindowTextW(choiceC);
+	client.Receive(&choiceD, sizeof(choiceD), 0);
+	m_btnA.SetWindowTextW(choiceD);
+	GetDlgItem(IDC_Skip)->EnableWindow(FALSE);
 }
 
-void CClientDlg::OnBnClickedStart() {
-	m_question.SetWindowTextW(_T("Question 1"));
-	m_btnA.SetWindowTextW(_T("A"));
-	m_btnB.SetWindowTextW(_T("B"));
-	m_btnC.SetWindowTextW(_T("C"));
-	m_btnD.SetWindowTextW(_T("D"));
-	int start = 0;
-	int end = m_status.GetWindowTextLength();
-	m_status.SetSel(start, end);
-	m_status.ReplaceSel(L"Start");
-}
 
 void CClientDlg::OnBnClickedA() {
-	m_status.SetWindowTextW(_T("Correct!"));
+	answer = "A";
+	client.Send((char*)&answer, sizeof(answer), 0);
+	client.Receive((char*)&msgSize, sizeof(int), 0);
+	temp = new char[msgSize + 1];
+	client.Receive((char*)temp, msgSize, 0);
+	if (temp == "0") {
+		m_status.SetWindowTextW(_T("Eliminated"));
+		GetDlgItem(IDC_btnA)->EnableWindow(FALSE);
+		GetDlgItem(IDC_btnB)->EnableWindow(FALSE);
+		GetDlgItem(IDC_btnC)->EnableWindow(FALSE);
+		GetDlgItem(IDC_btnD)->EnableWindow(FALSE);
+	}
+	delete temp;
 }
 
 void CClientDlg::OnBnClickedLogout() {
-	CSocket client;
 	client.Close();
+}
+
+void CClientDlg::OnBnClickedB(){
+	answer = "B";
+	client.Send((char*)&answer, sizeof(answer), 0);
+	client.Receive((char*)&msgSize, sizeof(int), 0);
+	temp = new char[msgSize + 1];
+	client.Receive((char*)temp, msgSize, 0);
+	temp[msgSize] = '\0';
+	question = CString(temp);
+	m_question.SetWindowText(question);
+	delete temp;
+
+
+	client.Receive((char*)&msgSize, sizeof(int), 0);
+	temp = new char[msgSize + 1];
+	client.Receive((char*)temp, msgSize, 0);
+	temp[msgSize] = '\0';
+	choiceA = CString(temp);
+	m_btnA.SetWindowTextW(choiceA);
+	delete temp;
+
+	client.Receive((char*)&msgSize, sizeof(int), 0);
+	temp = new char[msgSize + 1];
+	client.Receive((char*)temp, msgSize, 0);
+	temp[msgSize] = '\0';
+	choiceB = CString(temp);
+	m_btnB.SetWindowTextW(choiceB);
+	delete temp;
+
+	client.Receive((char*)&msgSize, sizeof(int), 0);
+	temp = new char[msgSize + 1];
+	client.Receive((char*)temp, msgSize, 0);
+	temp[msgSize] = '\0';
+	choiceC = CString(temp);
+	m_btnC.SetWindowTextW(choiceC);
+	delete temp;
+
+	client.Receive((char*)&msgSize, sizeof(int), 0);
+	temp = new char[msgSize + 1];
+	client.Receive((char*)temp, msgSize, 0);
+	temp[msgSize] = '\0';
+	choiceD = CString(temp);
+	m_btnD.SetWindowTextW(choiceD);
+	delete temp;
+}
+
+void CClientDlg::OnBnClickedC(){
+	answer = "C";
+	client.Send((char*)&answer, sizeof(answer), 0);
+}
+
+void CClientDlg::OnBnClickedD(){
+	answer = "D";
+	client.Send((char*)&answer, sizeof(answer), 0);
+}
+
+void CClientDlg::countdown() {
+	int t = 60;
+	string cd;
+	int n = t-1;
+	m_time.SetWindowText(_T("60"));
+	for (int i = 0; i < n; i++) {
+		int start = 0;
+		int end = m_time.GetWindowTextLength();
+		cd = to_string(n);
+		LPCTSTR new_cd = new TCHAR[cd.size() + 1];
+		m_time.SetSel(start, end);
+		m_time.ReplaceSel(new_cd);
+		n--;
+		Sleep(100);
+	}
 }

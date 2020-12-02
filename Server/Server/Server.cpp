@@ -1,27 +1,27 @@
-	// Client.cpp : Defines the entry point for the console application.
+
+// Server.cpp : Defines the class behaviors for the application.
 //
+
 #include "pch.h"
 #include "framework.h"
-#include "Client.h"
-#include "ClientDlg.h"
-#include"afxsock.h"
-using namespace std;
+#include "Server.h"
+#include "ServerDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CClientApp
+// CServerApp
 
-BEGIN_MESSAGE_MAP(CClientApp, CWinApp)
+BEGIN_MESSAGE_MAP(CServerApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CClientApp construction
+// CServerApp construction
 
-CClientApp::CClientApp()
+CServerApp::CServerApp()
 {
 	// support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -31,14 +31,14 @@ CClientApp::CClientApp()
 }
 
 
-// The one and only CClientApp object
+// The one and only CServerApp object
 
-CClientApp theApp;
+CServerApp theApp;
 
 
-// CClientApp initialization
+// CServerApp initialization
 
-BOOL CClientApp::InitInstance()
+BOOL CServerApp::InitInstance()
 {
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
@@ -55,7 +55,7 @@ BOOL CClientApp::InitInstance()
 
 	// Create the shell manager, in case the dialog contains
 	// any shell tree view or shell list view controls.
-	CShellManager* pShellManager = new CShellManager;
+	CShellManager *pShellManager = new CShellManager;
 
 	// Activate "Windows Native" visual manager for enabling themes in MFC controls
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
@@ -69,7 +69,7 @@ BOOL CClientApp::InitInstance()
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
-	CClientDlg dlg;
+	CServerDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
@@ -102,3 +102,4 @@ BOOL CClientApp::InitInstance()
 	//  application, rather than start the application's message pump.
 	return FALSE;
 }
+
