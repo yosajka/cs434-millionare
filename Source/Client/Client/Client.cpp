@@ -71,28 +71,45 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
   
 			
 			for (int q = 0; q < num_quest; q++) {
-				/*Question Q;
-				client.Receive((Question*)&Q, sizeof(Q), 0);
-				cout << "Question received" << endl;*/
-				/*cout << "Question " << q + 1 << ": " << Q.question << endl;
-				cout << "A. " << Q.choice_A << endl;
-				cout << "B. " << Q.choice_B << endl;
-				cout << "C. " << Q.choice_C << endl;
-				cout << "D. " << Q.choice_D << endl;*/
-				
-				string question, choice_A, choice_B, choice_C, choice_D, answer;
-				client.Receive(&question, sizeof(question), 0);
-				/*client.Receive((char*)&choice_A, sizeof(choice_A), 0);
-				client.Receive((char*)&choice_B, sizeof(choice_B), 0);
-				client.Receive((char*)&choice_C, sizeof(choice_C), 0);
-				client.Receive((char*)&choice_D, sizeof(choice_D), 0);
-				client.Receive((char*)&answer, sizeof(answer), 0);*/
+				int MsgSize;
+				char *temp;
 
-				cout << "Question " << q + 1 << ": " << question << endl;
-				/*cout << "A. " << choice_A << endl;
-				cout << "B. " << choice_B << endl;
-				cout << "C. " << choice_C << endl;
-				cout << "D. " << choice_D << endl; */
+				client.Receive((char*)&MsgSize, sizeof(int), 0);
+				temp = new char[MsgSize + 1];
+				client.Receive((char*)temp, MsgSize, 0);
+				temp[MsgSize] = '\0';
+				cout << temp << endl;
+				delete[] temp;
+				
+			
+
+				client.Receive((char*)&MsgSize, sizeof(int), 0);
+				temp = new char[MsgSize + 1];
+				client.Receive((char*)temp, MsgSize, 0);
+				temp[MsgSize] = '\0';
+				cout << "A. " << temp << endl;
+				delete[] temp;
+
+				client.Receive((char*)&MsgSize, sizeof(int), 0);
+				temp = new char[MsgSize + 1];
+				client.Receive((char*)temp, MsgSize, 0);
+				temp[MsgSize] = '\0';
+				cout << "B. " << temp << endl;
+				delete[] temp;
+
+				client.Receive((char*)&MsgSize, sizeof(int), 0);
+				temp = new char[MsgSize + 1];
+				client.Receive((char*)temp, MsgSize, 0);
+				temp[MsgSize] = '\0';
+				cout << "C. " << temp << endl;
+				delete[] temp;
+
+				client.Receive((char*)&MsgSize, sizeof(int), 0);
+				temp = new char[MsgSize + 1];
+				client.Receive((char*)temp, MsgSize, 0);
+				temp[MsgSize] = '\0';
+				cout << "D. " << temp << endl; 
+				delete[] temp;
 
 				// Send answer to server
 				string ans;
