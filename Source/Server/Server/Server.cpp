@@ -81,6 +81,14 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 		int num_client;
 		cout << "Enter number of clients: ";
 		cin >> num_client;
+
+		//ok
+		bool *ok = new bool[num_client];
+		for (int q = 0;q < num_client;++q)
+		{
+			ok[q] = true;
+		}
+
 		cout << "Listening..." << endl;
 		//Tao mang chua cac socket client
 		CSocket * sockClients = new CSocket[num_client];
@@ -111,7 +119,7 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 		//
 
 
-		for (int q = 0; q < num_quest; q++) {
+		for (int q = 0; q < num_quest; q++){
 			cout << "Question " << q + 1 << ": " << data[q].question << endl;
 			cout << "A. " << data[q].choice_A << endl;
 			cout << "B. " << data[q].choice_B << endl;
@@ -119,77 +127,70 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 			cout << "D. " << data[q].choice_D << endl;
 			
 			for (i = 0; i < num_client; i++) {
-				/*sockClients[i].Send((Question*)&data[q], sizeof(data[q]), 0);
-				cout << "Question sent" << endl;*/
-				sockClients[i].Send((char*)&data[q].question, sizeof(data[q].question), 0);
-				//sockClients[i].Send(data[i].question.c_str(), data[i].question.length());
-				//sockClients[i].Send((char*)&data[q].choice_A, sizeof(data[q].choice_A), 0);
-				//sockClients[i].Send((char*)&data[q].choice_B, sizeof(data[q].choice_B), 0);
-				//sockClients[i].Send((char*)&data[q].choice_C, sizeof(data[q].choice_C), 0);
-				//sockClients[i].Send((char*)&data[q].choice_D, sizeof(data[q].choice_D), 0);
-				//sockClients[i].Send((char*)&data[q].answer, sizeof(data[q].answer), 0);
-			}
+				if (!ok[i]) continue;
+				else
+				{
+					int MsgSize;
+					//Question
+					MsgSize = data[q].question.length();
+					char *Msg = new char[MsgSize + 1];
+					strcpy(Msg, data[q].question.c_str());
+					// Gui di do dai thong diep de Server biet duoc do dai nay
+					sockClients[i].Send(&MsgSize, sizeof(MsgSize), 0);
+					// Gui di thong diep voi do dai la MsgSize
+					sockClients[i].Send(Msg, MsgSize, 0);
 
+					delete[] Msg;
+					//A
+					MsgSize = data[q].choice_A.length();
+					Msg = new char[MsgSize + 1];
+					strcpy(Msg, data[q].choice_A.c_str());
+					// Gui di do dai thong diep de Server biet duoc do dai nay
+					sockClients[i].Send(&MsgSize, sizeof(MsgSize), 0);
+					// Gui di thong diep voi do dai la MsgSize
+					sockClients[i].Send(Msg, MsgSize, 0);
+					delete[] Msg;
+					//B
+					MsgSize = data[q].choice_B.length();
+					Msg = new char[MsgSize + 1];
+					strcpy(Msg, data[q].choice_B.c_str());
+					// Gui di do dai thong diep de Server biet duoc do dai nay
+					sockClients[i].Send(&MsgSize, sizeof(MsgSize), 0);
+					// Gui di thong diep voi do dai la MsgSize
+					sockClients[i].Send(Msg, MsgSize, 0);
+					//C
+					MsgSize = data[q].choice_C.length();
+					Msg = new char[MsgSize + 1];
+					strcpy(Msg, data[q].choice_C.c_str());
+					// Gui di do dai thong diep de Server biet duoc do dai nay
+					sockClients[i].Send(&MsgSize, sizeof(MsgSize), 0);
+					// Gui di thong diep voi do dai la MsgSize
+					sockClients[i].Send(Msg, MsgSize, 0);
+					//D
+					MsgSize = data[q].choice_D.length();
+					Msg = new char[MsgSize + 1];
+					strcpy(Msg, data[q].choice_D.c_str());
+					// Gui di do dai thong diep de Server biet duoc do dai nay
+					sockClients[i].Send(&MsgSize, sizeof(MsgSize), 0);
+					// Gui di thong diep voi do dai la MsgSize
+					sockClients[i].Send(Msg, MsgSize, 0);
+
+				}
+			}
 			// After 30s
 			string *player_answers = new string[num_client];
 			for (i = 0; i < num_client; i++) {
 				sockClients[i].Receive((char*)&player_answers[i], sizeof(string), 0);
 				if ( player_answers[i] != data[q].answer) {
 					cout << "Player " << i << " got the wrong answer!" << endl;
-					sockClients[i].Close();
-					num_client -= 1;
+					ok[i] = false;
 				}
 				else {
 					cout << "Player " << i << " got the right answer!" << endl;
 				}
 			}
-			if (num_client < 1)
-				break;
-
 		}
-		
 
-
-		//	//Moi client se gui 2 so, tuan tu tung client
-		//	//Tao mang chua cac so client gui
-		//	int * numbers = new int[num_client*2];
-
-		//	//Lan 1
-		//	for (i = 0; i < num_client; i++)
-		//	{
-		//		sockClients[i].Receive((char*)&numbers[i],sizeof(int),0);
-		//		printf("Da nhan tu client %d lan 1, so %d\n",i+1,numbers[i]);
-		//	}
-
-		//	//Lan 2
-		//	for (i=0;i<num_client;i++){
-		//		sockClients[i].Receive((char*)&numbers[i+num_client],sizeof(int),0);
-		//		printf("Da nhan tu client %d lan 2, so %d\n",i+1,numbers[i+num_client]);
-		//	}
-
-		//	//Den so luong cac so nguyen to
-		//	int count=0;
-		//	for (i=0;i<num_client*2;i++){
-		//		if (isPrime(numbers[i])){
-		//			count++;
-		//		}
-		//	}
-		//	printf("Danh sach cac so ma clients da gui:");
-		//	for (i=0;i<num_client*2;i++){
-		//		printf("%d;",numbers[i]);
-		//	}
-		//	printf("\r\nSo luong cac so nguyen to TAT CA client gui den %d\n",count);
-		//	//Gui ket qua cho tung client
-		//	for (i=0;i<num_client;i++){
-		//		printf("Gui ket qua cho client %d\n",i+1);
-		//		sockClients[i].Send((char*)&count,sizeof(int),0);
-		//		//Ngat ket noi voi client do
-		//		//sockClients[i].ShutDown(2); //Ngat ca chieu Gui va Nhan
-		//		sockClients[i].Close();
-		//	}
-		//	getchar();
-		//	server.Close();
-		//}
 		getchar();
 		return nRetCode;
 	}
